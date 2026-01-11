@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"KillMessage"
+	{
+		"en"		" {BLUE}[Rivalry]{DEFAULT} {GREEN}%s {DEFAULT}[ {GREEN}%d {DEFAULT}: {LIGHTRED}%d {DEFAULT}] {LIGHTRED}%s"
+		"ru"		" {BLUE}[Rivalry]{DEFAULT} {GREEN}%s {DEFAULT}[ {GREEN}%d {DEFAULT}: {LIGHTRED}%d {DEFAULT}] {LIGHTRED}%s"
+		"ua"		" {BLUE}[Rivalry]{DEFAULT} {GREEN}%s {DEFAULT}[ {GREEN}%d {DEFAULT}: {LIGHTRED}%d {DEFAULT}] {LIGHTRED}%s"
+	}
+	"DeathMessage"
+	{
+		"en"		" {BLUE}[Rivalry]{DEFAULT} {LIGHTRED}%s {DEFAULT}[ {LIGHTRED}%d {DEFAULT}: {GREEN}%d {DEFAULT}] {GREEN}%s"
+		"ru"		" {BLUE}[Rivalry]{DEFAULT} {LIGHTRED}%s {DEFAULT}[ {LIGHTRED}%d {DEFAULT}: {GREEN}%d {DEFAULT}] {GREEN}%s"
+		"ua"		" {BLUE}[Rivalry]{DEFAULT} {LIGHTRED}%s {DEFAULT}[ {LIGHTRED}%d {DEFAULT}: {GREEN}%d {DEFAULT}] {GREEN}%s"
+	}
+}
