@@ -4,6 +4,7 @@
 #include "schemasystem/schemasystem.h"
 #include <map>
 #include <string>
+#include <cstdint>
 #include <KeyValues.h>
 
 Rivalry g_Rivalry;
@@ -14,6 +15,7 @@ CEntitySystem* g_pEntitySystem = nullptr;
 CGlobalVars *gpGlobals = nullptr;
 
 IUtilsApi* g_pUtils;
+IPlayersApi* g_pPlayers = nullptr;
 
 std::map<std::string, std::string> g_vecPhrases;
 
@@ -33,7 +35,18 @@ void LoadTranslations()
 		g_vecPhrases[std::string(pKey->GetName())] = std::string(pKey->GetString(g_pszLanguage));
 }
 
-std::map<std::pair<int, int>, int> g_KillStats;
+static uint64 BuildPlayerId(int iSlot)
+{
+	if (g_pPlayers)
+	{
+		uint64 steamId = g_pPlayers->GetSteamID64(iSlot);
+		if (steamId != 0)
+			return steamId;
+	}
+	return (1ULL << 63) | static_cast<uint64>(iSlot);
+}
+
+std::map<std::pair<uint64, uint64>, int> g_KillStats;
 
 CGameEntitySystem* GameEntitySystem()
 {
@@ -65,10 +78,13 @@ void OnPlayerDeath(const char* szName, IGameEvent* pEvent, bool bDontBroadcast)
 	if (!pVictimController || !pAttackerController)
 		return;
 
-	g_KillStats[{iAttacker, iVictim}]++;
+	uint64 attackerId = BuildPlayerId(iAttacker);
+	uint64 victimId = BuildPlayerId(iVictim);
 
-	int iAttackerKills = g_KillStats[{iAttacker, iVictim}];
-	int iVictimKills = g_KillStats[{iVictim, iAttacker}];
+	g_KillStats[{attackerId, victimId}]++;
+
+	int iAttackerKills = g_KillStats[{attackerId, victimId}];
+	int iVictimKills = g_KillStats[{victimId, attackerId}];
 
 	const char* szAttackerName = pAttackerController->m_iszPlayerName();
 	const char* szVictimName = pVictimController->m_iszPlayerName();
@@ -123,6 +139,9 @@ void Rivalry::AllPluginsLoaded()
 		engine->ServerCommand(sBuffer.c_str());
 		return;
 	}
+	g_pPlayers = (IPlayersApi *)g_SMAPI->MetaFactory(PLAYESample_INTERFACE, &ret, NULL);
+	if (ret == META_IFACE_FAILED)
+		ConColorMsg(Color(255, 165, 0, 255), "[%s] Missing Players API, fallback to slot-based IDs for bots/unauthed clients\n", GetLogTag());
 	LoadTranslations();
 	g_pUtils->StartupServer(g_PLID, StartupServer);
 	g_pUtils->HookEvent(g_PLID, "player_death", OnPlayerDeath);
@@ -136,7 +155,7 @@ const char* Rivalry::GetLicense()
 
 const char* Rivalry::GetVersion()
 {
-	return "1.0";
+	return "1.0.1";
 }
 
 const char* Rivalry::GetDate()
